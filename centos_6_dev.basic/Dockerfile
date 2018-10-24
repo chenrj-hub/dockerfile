@@ -25,7 +25,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN yum groupinstall -y "Chinese Support"
 
 # Install Microsoft TrueType Fonts in CentOS 6
-RUN wget http://www.itzgeek.com/msttcore-fonts-2.0-3.noarch.rpm && rpm -Uvh msttcore-fonts-2.0-3.noarch.rpm && rm -f msttcore-fonts-2.0-3.noarch.rpm
+RUN wget http://olea.org/paquetes-rpm//msttcore-fonts-2.0-6.noarch.rpm && rpm -Uvh msttcore-fonts-2.0-6.noarch.rpm && rm -f msttcore-fonts-2.0-6.noarch.rpm
 
 ## 刷新内存中的字体缓存
 RUN fc-cache -fv
