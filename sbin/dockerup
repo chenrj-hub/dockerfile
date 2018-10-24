@@ -1,0 +1,565 @@
+#!/usr/bin/env bash
+
+function cecho () { 
+   
+   _color=$1
+   _message=$2
+   
+   _message=$_message$_newline
+   
+   
+   RED_COLOR='\E[1;31m'  #红
+   GREEN_COLOR='\E[1;36m' #绿
+   YELOW_COLOR='\E[1;33m' #黄
+   BLUE_COLOR='\E[1;34m'  #蓝
+   PINK_COLOR='\E[1;35m'      #紫色
+   RES='\E[0m'
+   
+   case $1 in
+     red | Red | r)
+       _color=$RED_COLOR
+     ;;
+     green | Green | g)
+       _color=$GREEN_COLOR
+     ;;
+     yelow | ye | Yelow | y)
+       _color=$YELOW_COLOR
+     ;;
+     blue | b | Blue)
+       _color=$BLUE_COLOR
+     ;;
+     pink | Pink | p)
+       _color=$PINK_COLOR
+     ;;
+     *)
+       _color=$PINK_COLOR
+     ;;
+   esac
+   
+   
+   echo -e  "${_color}${_message}${RES}"
+} 
+
+function cn_name () { 
+   
+   
+    ### container name pattern, 
+    ## 容器的名字必须是唯一的，当容器删除的时候会删除所有包含该名字的容器
+    ## 删除容器的时候并不删除卷(volume)
+    ## 方括号内的字符是变化的
+   
+    #> app.[container name: webname]
+    #     .[provider:container or mysql or h2db or oracle or redis or mongo or mssql or apache or nginx or tomcat or express or logstash]
+    #     .[type: volume or node or net or daemon or log]
+   
+    #> app.[ebid]_[volume].[mysqldb].[volume]
+    #> app.[ebid]_[volume].[apache].volume]
+    #> app.[ebid]_[node1].[nginx].node]
+    #> app.[ebid]_[node2].[nginx].node]
+    #> net.[ebid]
+   
+   
+   _CONTAINER_PREFIX="app"
+   _param_container_type=$1
+   _param_container_provider=$2
+   _param_container_name=$3
+   _param_container_number=$4
+   
+   if [[ $# -lt 2 || ! $_param_container_number = ?(-)+([0-9]) ]]; then
+     cecho r "请输入容器名字和节点编号, 节点编号必须是整数!"
+     exit
+   fi
+   
+   if [[ $_param_container_number == '-1' ]]; then
+     # 如果数量是-1,则忽略编号
+     _param_container_number=''
+   else 
+     _param_container_number='.'$_param_container_number
+   fi
+   
+   
+   
+   _container_name=`printf "$_CONTAINER_PREFIX.%s.%s.%s%s" $_param_container_name $_param_container_provider $_param_container_type $_param_container_number`
+   
+   echo $_container_name;
+} 
+
+function im_exists () { 
+   
+   
+   _user_local=true
+   _image_name=$1
+   
+   function image_exists {
+   
+   	  _exists='true'
+   	
+   	  if [[ $_user_local == 'true' ]]; then
+   	  	  _result=`docker inspect $1 2>&1 >/dev/null | awk '{split($0,a," " ); print a[5]}'`
+   	  	  _exists='local'
+   	  	  if [[ $_result == $_image_name ]]; then
+   		  	 _exists='false'
+   		  fi
+   	  else 
+   		  _result=`docker pull $1  2>&1 >/dev/null | awk '{split($0,a," " ); print a[7]}'`
+   		  _error=`docker pull $1  2>&1 >/dev/null | awk '{split($0,a," " ); print a[1]}'`
+   		  _exists='remote'
+   		  if [[ $_error == 'Error' || $_result == $_image_name ]]; then
+   		  	 _exists='false'
+   		  fi
+   	  fi 
+   	  
+   	  if [[ $_exists == 'false' ]]; then
+   	  	_exists=''
+   	  fi
+   	  
+   	  echo $_exists
+   	  
+   }
+   
+   image_exists $_image_name
+} 
+
+function cn_run () { 
+   
+   _app_name=$1	# 应用程序名字
+   _new_nodename=$2	# 容器名字
+   _image_name=$3		# 镜像名字
+   _network_name=$4	# 网络名字
+   _provider_name=$5 	# 类型， volume, redis, mysql, etc.	
+   _container_type=$6  # 
+   
+   _container_config=`cn_config $_app_name $_new_nodename $_image_name $_network_name $_provider_name`
+   
+   _container_id=`$_container_config | awk '{print substr($0,1,12)}'`
+   
+   cecho g "Container Confituration: "
+   
+   echo "### $_new_nodename:" >>  ./"$_app_name".command
+   echo "$_container_config" >> ./"$_app_name".command
+   echo ""  >> ./"$_app_name".command
+   cecho b "$_container_config"
+   
+   if [[ -z "$_container_id" ]]; then 
+     #cecho y "$_container_config"
+     cecho r "[$_new_nodename] 创建容器失败，容器名可能重复!"
+     exit
+   fi
+   
+   cecho y "容器创建成功 ["$_new_nodename"]"
+   echo ""
+   
+   if [[ $_provider_name != 'volume' ]]; then
+      
+       #_lasthosts=`docker exec $_container_id tail -1 /etc/hosts`
+   	#_ip=`echo $_lasthosts | awk '{split($0,a," " ); print a[1]}'`
+   	#_hostname=`echo $_lasthosts | awk '{split($0,a," " ); print a[2]}'`
+   	#_port_bind="无" #`docker port $_container_id | awk 'NR==1' | awk '{split($0,a,"[:/]" ); print a[1], a[3]}'`
+   	#cecho b "A****** $_container_id *******"
+   	#cecho y "A new continer is running: "
+   	#cecho y "Container Id: $_container_id"
+   	#cecho y "IP Address: $_ip"
+   	#cecho y "Hostname: $_new_nodename"
+   	#cecho y "Port: "`if [[ -z "$_port_bind" ]]; then   echo "无" ; else echo $_port_bind ; fi `
+   	#cecho b "******* $_container_id *******"
+   	
+   	#echo ""
+   	
+   	
+   	
+   	if [[ "$_provider_name" == "haproxy" ]]; then
+   	  # 如果容器启动成功，进入容器修改 
+   	  cecho y "进入容器修改 ["$_new_nodename"]"
+   	  cn_update $_app_name $_new_nodename loadbalance haproxy 
+   	fi
+   	
+   	#if [[ "$_provider_name" == "tomcat" ]]; then
+   	#  # 如果容器启动成功，进入 tomcat 容器修改 
+   	#  cn_update $_app_name $_new_nodename web tomcat 
+   	#fi
+      
+   fi
+} 
+
+function cn_config () { 
+   
+   _docker_config_file=$_APP_CONFIG_FILE
+   
+   _app_name=$1	# 应用程序名字
+   _new_nodename=$2
+   _image_name=$3
+   _network_name=$4
+   _provider_name=$5 	# 类型， redis, mysql, express, etc.	
+   _expose_ports=`im_expose $_image_name`
+   
+   _container_cmd=''
+   _container_volume=''
+   _container_env='' 	# 容器环境变量
+   _container_volume_from=`cn_name volume container $_app_name -1`
+   _container_slash_p='-P'
+   
+   _app_env=$(yaml $_docker_config_file main.app_env)
+   _app_ports=$(yaml $_docker_config_file main.app_port)
+   
+   _tomcat_volume=$(yaml $_docker_config_file volumes.tomcat)
+   _tomcat_log_volume=$(yaml $_docker_config_file volumes.tomcat_log)
+   _express_volume=$(yaml $_docker_config_file volumes.express)
+   _mysql_volume=$(yaml $_docker_config_file volumes.mysql)
+   _jdk_volume=$(yaml $_docker_config_file volumes.jdk)
+   
+   _passwd_redis=$(yaml $_docker_config_file redis.redis_passwd)
+   _passwd_mysql=$(yaml $_docker_config_file mysql.mysql_passwd)
+   
+   
+   if [[ $_provider_name == 'volume' ]]; then
+   
+     if [[ ! -z "$_express_volume" ]]; then 
+       # express volume
+       _container_volume="$_container_volume -v $_express_volume:/root/nodejs/app"
+     fi
+   	
+     if [[ ! -z "$_tomcat_volume" ]]; then 
+       # tomcat volume
+       _container_volume="$_container_volume -v $_tomcat_volume:/usr/local/tomcat/webapps/ROOT -v $_tomcat_log_volume:/usr/local/tomcat/logs"
+     fi
+     
+     if [[ ! -z "$_mysql_volume" ]]; then 
+       # mysql volume
+       _container_volume="$_container_volume -v $_mysql_volume:/var/lib/mysql_data"
+     fi
+     
+     if [[ ! -z "$_jdk_volume" ]]; then 
+       # mysql volume
+       _container_volume="$_container_volume -v $_jdk_volume:/root/app"
+     fi
+   fi 
+   
+   
+   if [[ $_provider_name == 'mysql' ]]; then 
+   	#_container_env="-e MYSQL_ROOT_PASSWORD=$_passwd_mysql"
+   	_container_env="-e MYSQL_ROOT_PASSWORD=Cc"
+     #  _container_slash_p='-p 3307:3306'
+   fi
+   
+   if [[ $_provider_name == 'express' ]]; then
+       _container_cmd="server.js $_app_env"
+   fi 
+   
+   
+   if [[ $_provider_name == 'jdk' ]]; then
+       _container_cmd="/root/app/redeploy.sh $_app_env"
+   fi 
+   
+   if [[ $_provider_name == 'redis' ]]; then 
+   	_container_cmd="--requirepass $_passwd_redis"
+   fi
+   
+   if [[ $_provider_name == 'volume' ]]; then 
+     echo "docker create --net $_network_name -h $_new_nodename $_container_volume --name $_new_nodename $_image_name $_container_cmd"
+   fi
+   
+   if [[ $_provider_name == 'haproxy' ]]; then 
+   
+     OLD_IFS="$IFS" 
+     IFS=" " 
+     _app_port_arr=($_app_ports) 
+     _expose_port_arr=($_expose_ports) 
+     IFS="$OLD_IFS" 
+     _app_ports_slash_p=''
+   
+     for (( i = 0 ; i < ${#_app_port_arr[@]} ; i++ ))
+     do
+     	
+     	if [[ -z "${_expose_port_arr[$i]}" ]]; then
+   		break
+     	fi
+   
+     	_app_ports_slash_p=`printf "%s-p %s:%s" "$_app_ports_slash_p " "${_app_port_arr[$i]}" "${_expose_port_arr[$i]}"`
+     	
+     done
+   
+     [[ -z "$_app_ports_slash_p" ]] && _container_slash_p="-P" || _container_slash_p="$_app_ports_slash_p"
+   
+     #_container_slash_p=$(_app_ports_slash_p:-" -P ")
+   
+   fi
+   
+   
+   if [[ $_provider_name != 'volume' ]]; then 
+     echo "docker create $_container_slash_p --net $_network_name -h $_new_nodename --volumes-from $_container_volume_from --name $_new_nodename $_container_env $_image_name $_container_cmd"
+   fi
+   
+   
+   
+} 
+
+function cn_update () { 
+   
+   chmod +x `pwd`/${_DOCKER_APP_NAME}.hook
+   
+   _docker_config_file=$_APP_CONFIG_FILE
+   
+   _app_name=$1			#
+   _container_name=$2			# 
+   _container_type=$3			# loadbanance
+   _container_provider=$4		# provider
+   
+   _web_backend_provider="app.$_app_name.express.web.*"
+   
+   docker start "$_container_name"  2>&1 >/dev/null
+   
+   if [[ $_container_type == "loadbalance" ]]; then
+   	## 根据后端 web 引擎，取出容器名字
+   	#docker inspect `docker ps -a | grep $_web_backend_provider | awk '{split($0, a, " "); print a[1]}'` -f "{{ .Name }}" | awk '{split($0, a, "/"); print a[2]}'
+   	_container_ids=`docker ps -a | grep "$_web_backend_provider" | awk '{split($0, a, " "); print a[1]}'`
+   	_container_names=`docker inspect $_container_ids -f "{{ .Name }}" | awk '{split($0, a, "/"); print a[2]}'`
+   	_container_nodes_name_and_port=`docker inspect $_container_ids -f "{{ .Name }}:{{ .Config.ExposedPorts }}" | awk 'gsub(/\/|map|\[|\]|tcp:|{}/, "", $0) {print}'`
+   	
+   	_node_index=0
+   	_container_nodes_cluster_string=''
+   	
+   	for node in $_container_nodes_name_and_port ; do 
+   	  _node_index=$[$_node_index+1]
+   	  _container_nodes_cluster_string=`printf "server s%s %s check" $_node_index $node`
+   	  docker exec -it $_container_name sed -i -e "s/server[[:space:]]*s0[[:space:]]*127.0.0.1:80 check/\n        $_container_nodes_cluster_string server s0 127.0.0.1:80 check/g" /etc/haproxy/haproxy.cfg
+   	done;
+   	
+   	#docker exec -it $_container_name sed -i -e "s/server s0 127.0.0.1:80 check/server s1 app.my_server.nginx.web.1:80 check\n        server s2 app.my_server.nginx.web.2:80 check/g" /etc/haproxy/haproxy.cfg
+   	if ! [[ -z "$_container_nodes_cluster_string" ]]; then
+   	  docker exec -it $_container_name sed -i -e "s/server[[:space:]]*s0[[:space:]]*127.0.0.1:80 check//g" /etc/haproxy/haproxy.cfg
+   	  #docker restart "$_container_name"
+   	fi
+   	
+   	echo ""
+   fi
+} 
+
+function im_build () { 
+   
+   _image_path=$1
+   _user_account=`echo $1 | awk '{split($0,a,"/" ); print a[1]}'`
+   _image_name=`echo $1 | awk '{split($0,a,"/" ); print a[2]}' | awk '{split($0,a,":" ); print a[1]'}`
+   _image_tag=`echo $1 | awk '{split($0,a,"/" ); print a[2]}' | awk '{split($0,a,":" ); print a[2]'}`
+   
+   _image_exists=`im_exists $_image_path`
+   
+   if [[ -z "$_image_exists" || 1==1 ]]; then 
+     # not exists
+     # build image
+     cecho p "Building Docker Image: ["$_image_path"]"
+     docker rmi $_image_path>/dev/null 2>/dev/null
+     docker build -t $_image_path $DOCKER_IMAGES_HOME/$_image_name.$_image_tag
+     cecho g "Build Docker Image Completed >>>> $_image_path <<<<"
+   else 
+     # exists 
+     if [[ $_image_exists == 'remote' ]]; then
+     	cecho b "Pull a docker image from docker hub: ["$_image_path"]"
+     fi
+     if [[ $_image_exists == 'local' ]]; then
+     	cecho y "Use docker image from local: ["$_image_path"]"
+     fi
+   fi
+} 
+
+function im_name () { 
+   
+   _image_name=`cat Dockerfile | grep '^\s*#' | awk 'NR==1' | awk '{split($0,a," " ); print a[2]}'`
+   echo $_image_name
+} 
+
+function im_expose () { 
+   
+   _image_name=$1
+   _expose_port=`docker inspect $_image_name | grep /tcp\": |  sed 's/[^0-9]//g' | awk '{printf("%s ",$0);}'`
+   _len=`expr ${#_expose_port} / 2`
+   _result=`expr substr "$_expose_port" 1 $_len`
+   
+   
+   echo $_result
+} 
+
+function yaml () { 
+   
+   
+   hashdot=$(gem list hash_dot);
+   if ! [ "$hashdot" != "" ]; then sudo gem install "hash_dot" ; fi
+   if [ -f $1 ];then
+       cmd=" Hash.use_dot_syntax = true; hash = YAML.load(File.read('$1'));";
+       if [ "$2" != "" ] ;then 
+           cmd="$cmd puts hash.$2;"
+       else
+           cmd="$cmd puts hash;"
+       fi
+       ruby -r yaml -r hash_dot <<< $cmd;
+   else 
+      cecho r "[$1] not exists!"
+   fi
+} 
+
+function dockerup () { 
+   
+   
+   
+   declare _app_config_file=`pwd`/*.App.yml
+   
+   declare _app_name=$(yaml $_app_config_file main.app_name)
+   declare _app_main_port=$(yaml $_app_config_file main.app_port)
+   
+   echo "Docker Command: " > "$_app_name".command
+   
+   
+   sed -i -e "s/[[:space:]]*redis_passwd:.*$/    redis_passwd: `openssl rand -base64 32 | awk 'gsub(/\/|\[|\]|#|=/, "", $0) {print}'`/g" $_app_config_file
+   sed -i -e "s/[[:space:]]*mysql_passwd:.*$/    mysql_passwd: `openssl rand -base64 32 | awk 'gsub(/\/|\[|\]|#|=/, "", $0) {print}'`/g" $_app_config_file
+   
+   
+   export _DOCKER_APP_NAME=${_app_name}
+   export _APP_CONFIG_FILE=$_app_config_file
+   
+   
+   declare -A _input_params=()
+   
+   
+   if [[ $(yaml $_app_config_file images.volume) ]]; then
+     _input_params["volume"]=$(yaml $_app_config_file images.volume)
+   fi
+   
+   if [[ $(yaml $_app_config_file images.mysql) ]]; then
+     _input_params["mysql"]=$(yaml $_app_config_file images.mysql)
+   fi
+   
+   
+   if [[ $(yaml $_app_config_file images.jdk) ]]; then
+     _input_params["jdk"]=$(yaml $_app_config_file images.jdk)
+   fi
+   
+   
+   if [[ $(yaml $_app_config_file images.tomcat) ]]; then
+     _input_params["tomcat"]=$(yaml $_app_config_file images.tomcat)
+   fi
+   
+   if [[ $(yaml $_app_config_file images.redis) ]]; then
+     _input_params["redis"]=$(yaml $_app_config_file images.redis)
+   fi
+   
+   if [[ $(yaml $_app_config_file images.logstash) ]]; then
+     _input_params["logstash"]=$(yaml $_app_config_file images.logstash)
+   fi
+   
+   if [[ $(yaml $_app_config_file images.express) ]]; then
+     _input_params["express"]=$(yaml $_app_config_file images.express)
+   fi
+   
+   if [[ $(yaml $_app_config_file images.haproxy) ]]; then
+     _input_params["haproxy"]=$(yaml $_app_config_file images.haproxy)
+   fi
+   
+   
+   _network_name=`docker network ls | grep ${_app_name}_network | awk '{split($0,a," " ); print a[2]}'`
+   
+   if [[ -z "$_network_name" ]]; then
+     docker network create ${_app_name}_network
+   fi
+   
+   if [[ ${_input_params['volume']+isset} ]]; then 
+     docker pull "${_input_params['volume']}"
+     _container_volume_name=`cn_name volume container $_app_name -1`
+     cn_run $_app_name $_container_volume_name ${_input_params["volume"]} $_network_name volume volume
+     
+   fi
+   
+   
+   
+   if [[ ${_input_params['tomcat']+isset} ]]; then 
+     docker pull "${_input_params['tomcat']}"
+     cecho p "Running Tomcat Node Containers:"
+     _container_node_name=`cn_name web tomcat $_app_name 1`
+     cn_run $_app_name $_container_node_name ${_input_params["tomcat"]} $_network_name tomcat web
+   fi
+   
+   if [[ ${_input_params['jdk']+isset} ]]; then 
+     docker pull "${_input_params['jdk']}"
+     cecho p "Running jdk Node Containers:"
+     _container_node_name=`cn_name web jdk $_app_name 1`
+     cn_run $_app_name $_container_node_name ${_input_params["jdk"]} $_network_name jdk web
+   fi
+   
+   if [[ ${_input_params['nginx']+isset} ]]; then 
+     docker pull "${_input_params['nginx']}"
+     cecho p "Running Nginx Node Containers:"
+     _container_node_name=`cn_name web nginx $_app_name 1`
+     cn_run $_app_name $_container_node_name ${_input_params["nginx"]} $_network_name nginx web
+     _container_node_name=`cn_name web nginx $_app_name 2`
+     cn_run $_app_name $_container_node_name ${_input_params["nginx"]} $_network_name nginx web
+   fi
+   
+   if [[ ${_input_params['express']+isset} ]]; then 
+     docker pull "${_input_params['express']}"
+     cecho p "Running Express Node Containers:"
+     _container_node_name=`cn_name web express $_app_name 1`
+     cn_run $_app_name $_container_node_name ${_input_params["express"]} $_network_name express web
+     _container_node_name=`cn_name web express $_app_name 2`
+     cn_run $_app_name $_container_node_name ${_input_params["express"]} $_network_name express web
+   fi
+   
+   if [[ ${_input_params['redis']+isset} ]]; then 
+     	docker pull "${_input_params['redis']}"
+   	# run redis VOLUME container
+   	# TODO
+   	# run redis container
+   	_container_node_name=`cn_name primary redis $_app_name -1`
+   	#echo $_container_node_name
+   	cn_run $_app_name $_container_node_name ${_input_params['redis']} $_network_name redis primary
+   fi
+   
+   if [[ ${_input_params['mysql']+isset} ]]; then 
+     docker pull "${_input_params['mysql']}"
+     # run mysql VOLUME container
+     # TODO
+     # run mysql container
+     _container_node_name=`cn_name primary mysql $_app_name -1`
+     # -v /storage/mysql-server/datadir:/var/lib/mysql_data
+     cn_run $_app_name $_container_node_name ${_input_params['mysql']} $_network_name mysql primary
+     
+     
+   fi
+   
+   if [[ ${_input_params['logstash']+isset} ]]; then 
+     docker pull "${_input_params['logstash']}"
+     # run logstash container
+     _container_node_name=`cn_name log logstash $_app_name -1`
+     #docker run -d -P --name $_container_node_name ${_input_params['logstash']}
+     cn_run $_app_name $_container_node_name ${_input_params['logstash']} $_network_name logstash log
+   fi
+   
+   if [[ ${_input_params['haproxy']+isset} ]]; then 
+     docker pull "${_input_params['haproxy']}"
+     # run haproxy
+     _container_node_name=`cn_name loadbalance haproxy $_app_name -1`
+     # sed -i -e "s/server s0 hostname_here:80 check/server s1 172.17.0.3:80 check\n        server s2 172.17.0.4:80 check/g" /etc/haproxy/haproxy.cfg
+     #docker run -d -P --name $_container_node_name -h $_container_node_name ${_input_params['haproxy']}
+     cn_run $_app_name $_container_node_name ${_input_params['haproxy']} $_network_name  haproxy loadbalance
+   fi
+   
+   
+   echo ""  >> "$_app_name".command
+   echo "EOF" >> "$_app_name".command
+   
+   `pwd`/${_DOCKER_APP_NAME}.hook
+   
+   cecho y "应用程序 [$_app_name] 创建成功，正在重启....."
+   docker restart `docker ps -a | grep $_app_name | awk '{split($0, a, " "); print a[1]}'`
+   docker restart `docker ps -a | grep $_app_name | grep loadbalance | awk '{split($0, a, " "); print a[1]}'`
+   
+   echo ""
+   
+   cat $_APP_CONFIG_FILE
+   
+   
+} 
+
+export -f yaml
+
+dockerup
+
+
+
