@@ -1,7 +1,7 @@
-# chunhui2001/centos_7_dev:haproxy_instance
+# chenrj/centos_7_dev:haproxy_instance
 # Version 0.0.1
-FROM chunhui2001/centos_7_dev:haproxy_base
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_7_dev:haproxy_base
+MAINTAINER chenrj "790099746@qq.com"
 
 
 #ENV DOMAIN_NAME='-d example.com -d www.example.com'

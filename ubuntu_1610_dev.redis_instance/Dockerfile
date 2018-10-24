@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:redis_instance
+# chenrj/ubuntu_1610_dev:redis_instance
 # Version 0.0.1
-FROM chunhui2001/ubuntu_1610_dev:redis_base
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/ubuntu_1610_dev:redis_base
+MAINTAINER chenrj "790099746@qq.com"
 
 ENV REFRESHED_AT 2017-10-30
 

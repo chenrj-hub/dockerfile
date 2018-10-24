@@ -1,7 +1,7 @@
-# chunhui2001/centos_6_dev:nodejs_base
+# chenrj/centos_6_dev:nodejs_base
 # Version 0.0.1
-FROM chunhui2001/centos_6_dev:basic
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_6_dev:basic
+MAINTAINER chenrj "790099746@qq.com"
 
 ARG NODE_VERSION=v6.11.3
 ARG PHANTOMJS_VERSION=1.9.8

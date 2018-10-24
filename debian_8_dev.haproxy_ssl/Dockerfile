@@ -1,7 +1,7 @@
-# chunhui2001/debian_8_dev:haproxy_ssl
+# chenrj/debian_8_dev:haproxy_ssl
 # Version 0.0.1
 FROM bradjonesllc/docker-haproxy-letsencrypt
-MAINTAINER Chunhui.Zhang <chunhui2001@gmail.com>
+MAINTAINER chenrj "790099746@qq.com"
 
 RUN apt-get update -y && apt-get install vim -y
 

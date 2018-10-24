@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:java8
+# chenrj/ubuntu_1610_dev:java8
 # Version 0.0.1
-FROM chunhui2001/ubuntu_1610_dev:zh-CN
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/ubuntu_1610_dev:zh-CN
+MAINTAINER chenrj "790099746@qq.com"
 
 # copy files
 # COPY jdk-8u151-linux-x64.tar.gz /usr/local/

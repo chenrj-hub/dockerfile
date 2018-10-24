@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:logstash_base
+# chenrj/ubuntu_1610_dev:logstash_base
 # Version 0.0.1
 FROM ubuntu:14.04
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+MAINTAINER chenrj "790099746@qq.com"
 
 RUN apt-get -y update && apt-get install -y wget
 RUN wget -O - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -

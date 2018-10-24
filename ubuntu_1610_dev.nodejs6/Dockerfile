@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:nodejs6
+# chenrj/ubuntu_1610_dev:nodejs6
 # Version 0.0.1
-FROM chunhui2001/ubuntu_1610_dev:nodejs_base
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/ubuntu_1610_dev:nodejs_base
+MAINTAINER chenrj "790099746@qq.com"
 
 ARG APP_NAME='____appname'
 ARG APP_ENV='local'

@@ -1,8 +1,7 @@
-# chunhui2001/debian_8_dev:mysql_5.7
+# chenrj/debian_8_dev:mysql_5.7
 # Version 0.0.1
-FROM chunhui2001/ubuntu_1610_dev:basic
-# FROM chunhui2001/ubuntu_1610_dev:temp
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/ubuntu_1610_dev:basic
+MAINTAINER chenrj "790099746@qq.com"
 
 
 # Install dependencies

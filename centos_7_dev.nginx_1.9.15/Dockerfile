@@ -1,7 +1,7 @@
-# chunhui2001/centos_7_dev:nginx_1.9.15
+# chenrj/centos_7_dev:nginx_1.9.15
 # Version 0.0.1
-FROM chunhui2001/centos_7_dev:basic
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_7_dev:basic
+MAINTAINER chenrj "790099746@qq.com"
 
 # Add nginx_work.tar to /root/
 ADD nginx-work.tar /root/

@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:zh-CN
+# chenrj/ubuntu_1610_dev:zh-CN
 # Version 0.0.1
 FROM ubuntu:16.10
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+MAINTAINER chenrj "790099746@qq.com"
 
 ## 
 # RUN sed -i -e"s/security.ubuntu.com/us.archive.ubuntu.com/" /etc/apt/sources.list

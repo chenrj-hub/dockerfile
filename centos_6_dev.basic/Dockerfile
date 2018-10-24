@@ -1,7 +1,7 @@
-# chunhui2001/centos_6_dev:basic 
+# chenrj/centos_6_dev:basic 
 # Version 0.0.1
 FROM centos:6
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+MAINTAINER chenrj "790099746@qq.com"
 
 # Install dev tools
 RUN yum -y update && yum groupinstall -y "Development Tools" && yum install -y wget mkfontscale zlib-devel

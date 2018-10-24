@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:basic 
+# chenrj/ubuntu_1610_dev:basic 
 # Version 0.0.1
 FROM ubuntu:16.10
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+MAINTAINER chenrj "790099746@qq.com"
 
 # Install dev tools
 RUN apt-get update 

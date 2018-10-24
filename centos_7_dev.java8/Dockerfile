@@ -1,7 +1,7 @@
-# licj316/centos_7_dev:java8
+# chenrj/centos_7_dev:java8
 # Version 0.0.1
-FROM licj316/centos_7_dev:basic 
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_7_dev:basic 
+MAINTAINER chenrj "790099746@qq.com"
 
 # download files
 WORKDIR /usr/local

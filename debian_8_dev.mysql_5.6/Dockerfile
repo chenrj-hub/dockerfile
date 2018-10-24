@@ -1,7 +1,7 @@
-# chunhui2001/debian_8_dev:mysql_5.6
+# chenrj/debian_8_dev:mysql_5.6
 # Version 0.0.1
 FROM mysql:5.6
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+MAINTAINER chenrj "790099746@qq.com"
 
 RUN apt-get update -y && apt-get install vim -y
 

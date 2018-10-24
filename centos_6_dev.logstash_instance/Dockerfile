@@ -1,7 +1,7 @@
-# chunhui2001/centos_6_dev:logstash_instance
+# chenrj/centos_6_dev:logstash_instance
 # Version 0.0.1
-FROM chunhui2001/centos_6_dev:logstash_base
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_6_dev:logstash_base
+MAINTAINER chenrj "790099746@qq.com"
 
 # Refer
 # http://www.cnblogs.com/linuxboke/p/5706813.html

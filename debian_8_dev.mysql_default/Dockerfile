@@ -1,7 +1,7 @@
-# chunhui2001/debian_8_dev:mysql_default
+# chenrj/debian_8_dev:mysql_default
 # Version 0.0.1
 FROM mysql:5.7
-MAINTAINER Chunhui.Zhang <chunhui2001@gmail.com>
+MAINTAINER chenrj "790099746@qq.com"
 
 ## Refer
 # https://severalnines.com/blog/mysql-docker-building-container-image

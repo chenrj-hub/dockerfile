@@ -1,7 +1,7 @@
-# licj316/centos_6_dev:logstash_base
+# chenrj/centos_6_dev:logstash_base
 # Version 0.0.1
-FROM licj316/centos_6_dev:java8
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_6_dev:java8
+MAINTAINER chenrj "790099746@qq.com"
 
 ## Refer: 
 #  http://blog.csdn.net/u012373815/article/details/51029826

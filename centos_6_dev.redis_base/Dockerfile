@@ -1,7 +1,7 @@
-# licj316/centos_6_dev:redis_base
+# chenrj/centos_6_dev:redis_base
 # Version 0.0.1
-FROM licj316/centos_6_dev:basic
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_6_dev:basic
+MAINTAINER chenrj "790099746@qq.com"
 
 
 ## Set workdir

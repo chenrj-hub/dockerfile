@@ -1,7 +1,7 @@
-# chunhui2001/ubuntu_1610_dev:tomcat8
+# chenrj/ubuntu_1610_dev:tomcat8
 # Version 0.0.1
-FROM chunhui2001/ubuntu_1610_dev:java8
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/ubuntu_1610_dev:java8
+MAINTAINER chenrj "790099746@qq.com"
 
 ENV JAVA_HOME=/usr/local/java
 WORKDIR /usr/local

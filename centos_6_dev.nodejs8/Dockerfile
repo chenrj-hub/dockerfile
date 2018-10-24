@@ -1,7 +1,7 @@
-# licj316/centos_6_dev:nodejs8
+# chenrj/centos_6_dev:nodejs8
 # Version 0.0.1
-FROM licj316/centos_6_dev:nodejs8_base
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_6_dev:nodejs8_base
+MAINTAINER chenrj "790099746@qq.com"
 
 ARG APP_NAME='____appname'
 ARG APP_ENV='local'

@@ -1,7 +1,7 @@
-# licj316/centos_7_dev:tomcat8
+# chenrj/centos_7_dev:tomcat8
 # Version 0.0.1
-FROM licj316/centos_7_dev:java8
-MAINTAINER Chunhui.Zhang "chunhui2001@gmail.com"
+FROM chenrj/centos_7_dev:java8
+MAINTAINER chenrj "790099746@qq.com"
 
 ENV JAVA_HOME=/usr/java/latest
 WORKDIR /usr/local
